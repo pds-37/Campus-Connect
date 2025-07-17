@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Connect Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans">
+
+    <!-- NEW: Loading Indicator -->
+    <div id="loadingIndicator" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-white"></div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="fixed inset-0 bg-slate-200 flex items-center justify-center z-40">
+        <div class="w-full max-w-sm bg-white p-8 rounded-xl shadow-2xl">
+            <h2 class="text-3xl font-bold text-slate-700 text-center mb-2">College Connect Hub</h2>
+            <p class="text-center text-slate-500 mb-6">Please sign in to continue</p>
+            <form id="loginForm">
+                <div class="space-y-4">
+                    <input type="text" id="username" placeholder="Username (e.g., student or admin)" required class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+                    <input type="password" id="password" placeholder="Password (e.g., pass123)" required class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+                    <p id="loginError" class="text-red-500 text-sm text-center hidden">Invalid username or password.</p>
+                    <button type="submit" class="w-full bg-sky-500 text-white p-3 rounded-lg font-semibold hover:bg-sky-600 transition-colors">Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app" class="container mx-auto p-4 md:p-6 lg:p-8 hidden">
+
+        <!-- Header -->
+        <header class="mb-6 flex flex-col sm:flex-row justify-between items-center pb-4 border-b border-slate-200">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-bold text-slate-700">College Connect Hub</h1>
+                <p class="text-slate-500 mt-1">Your central point for campus information and items.</p>
+            </div>
+            <div id="userInfo" class="flex items-center space-x-4 mt-4 sm:mt-0">
+                <div class="text-right">
+                    <p class="font-semibold text-slate-700" id="loggedInUser"></p>
+                    <p class="text-sm text-slate-500" id="userRoleDisplay"></p>
+                </div>
+                <button id="logoutBtn" class="px-4 py-2 text-sm bg-slate-600 text-white font-semibold rounded-lg shadow-md hover:bg-slate-700 transition-colors">Logout</button>
+            </div>
+        </header>
+
+        <!-- Main Navigation Tabs -->
+        <nav class="mb-6">
+            <div class="flex border-b border-slate-200">
+                <button data-tab="lost-and-found" class="tab-button flex-1 sm:flex-initial text-center sm:text-left font-semibold p-4 border-b-2 transition-colors duration-300">Lost & Found</button>
+                <button data-tab="information-hub" class="tab-button flex-1 sm:flex-initial text-center sm:text-left font-semibold p-4 border-b-2 transition-colors duration-300">Information Hub</button>
+                <button data-tab="how-it-works" class="tab-button flex-1 sm:flex-initial text-center sm:text-left font-semibold p-4 border-b-2 transition-colors duration-300">How It Works</button>
+            </div>
+        </nav>
+
+        <main>
+            <!-- Lost & Found Page -->
+            <div id="lost-and-found" class="tab-content">
+                 <div class="p-6 bg-white rounded-lg shadow-sm">
+                    <div class="text-center mb-6">
+                        <h2 class="text-2xl font-bold text-slate-700">Lost & Found Center</h2>
+                        <p class="text-slate-500 mt-1">Browse found items, or report something you've lost.</p>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row justify-center gap-3 mb-8">
+                         <button id="reportLostItemBtn" class="w-full sm:w-auto px-6 py-3 bg-amber-500 text-white font-semibold rounded-lg shadow-md hover:bg-amber-600 transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-opacity-50 student-only">🙋 Report a Lost Item</button>
+                         <button id="adminUploadBtn" class="w-full sm:w-auto px-6 py-3 bg-slate-600 text-white font-semibold rounded-lg shadow-md hover:bg-slate-700 transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-opacity-50 admin-only">➕ Upload a Found Item</button>
+                         <button id="viewReportsBtn" class="w-full sm:w-auto px-6 py-3 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600 transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">👀 View Student Reports</button>
+                    </div>
+
+                    <div id="lostReportsSection" class="hidden mb-8">
+                        <div class="border border-indigo-200 bg-indigo-50 rounded-lg">
+                            <h3 class="font-bold text-lg text-indigo-800 p-4 border-b border-indigo-200">Student Lost Item Reports</h3>
+                            <div id="reportsList" class="max-h-96 overflow-y-auto">
+                                <!-- Reports will be injected here by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Found Items Gallery -->
+                    <div id="foundItemsSection">
+                        <div class="mb-6 p-4 border border-slate-200 rounded-lg bg-slate-50">
+                            <h3 class="font-bold text-lg text-slate-600 mb-3 text-center">Search Found Items</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input type="text" id="searchInput" placeholder="Search by keyword (e.g., 'bottle', 'black')" class="p-2 border border-slate-300 rounded-md w-full focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+                                <select id="categoryFilter" class="p-2 border border-slate-300 rounded-md w-full focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+                                    <option value="all">All Categories</option>
+                                    <option value="electronics">Electronics</option>
+                                    <option value="stationery">Stationery</option>
+                                    <option value="accessories">Accessories</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="itemsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            <!-- Items will be injected here by JS -->
+                        </div>
+                         <p id="noResults" class="text-center text-slate-500 py-10 hidden">No items match your search.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Information Hub Page -->
+            <div id="information-hub" class="tab-content hidden">
+                 <div class="p-6 bg-white rounded-lg shadow-sm">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                         <div>
+                            <h2 class="text-2xl font-bold text-slate-700">Information Hub</h2>
+                            <p class="text-slate-500 mt-1">Official notices and broadcasts from the administration.</p>
+                         </div>
+                         <button id="createMessageBtn" class="mt-4 sm:mt-0 px-6 py-3 bg-sky-500 text-white font-semibold rounded-lg shadow-md hover:bg-sky-600 transition-transform transform hover:scale-105 admin-only">✍️ Create New Message</button>
+                    </div>
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <!-- Message List -->
+                        <div id="messageListContainer" class="w-full md:w-1/3 border border-slate-200 rounded-lg overflow-hidden">
+                             <div class="bg-slate-50 p-3 font-semibold text-slate-600 border-b border-slate-200">Recent Notices</div>
+                            <ul id="messageList" class="h-96 overflow-y-auto">
+                                <!-- Messages injected here -->
+                            </ul>
+                        </div>
+                        <!-- Message Detail View -->
+                        <div id="messageDetailContainer" class="w-full md:w-2/3 border border-slate-200 rounded-lg p-6 bg-slate-50">
+                            <div id="messageDetail">
+                                <p class="text-center text-slate-500">Select a message to read it.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- How It Works Page -->
+            <div id="how-it-works" class="tab-content hidden">
+                 <div class="p-6 bg-white rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold text-slate-700 text-center mb-2">How Our System Works</h2>
+                     <p class="text-slate-500 text-center mb-8">This application streamlines campus communication. Below is a visual breakdown of the key processes.</p>
+
+                    <!-- Lost and Found Flowchart -->
+                    <div class="mb-12">
+                        <h3 class="text-xl font-semibold text-sky-600 mb-6 text-center">Lost & Found Process Flow</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
+                            <!-- Student Flow -->
+                            <div class="border p-4 rounded-lg bg-slate-50">
+                                <h4 class="font-bold text-lg mb-4 text-center">1. Student Loses an Item</h4>
+                                <div class="space-y-2">
+                                    <div class="flow-box">Logs into Portal</div>
+                                    <div class="h-6 flow-arrow"></div>
+                                    <div class="flow-box">Navigates to 'Lost & Found'</div>
+                                    <div class="h-6 flow-arrow"></div>
+                                    <div class="flow-box">Fills out 'Report Lost Item' Form</div>
+                                    <div class="h-6 flow-arrow"></div>
+                                    <div class="flow-box bg-sky-100 text-sky-800">Report is visible to All Members</div>
+                                </div>
+                            </div>
+                            <!-- Admin Flow -->
+                            <div class="border p-4 rounded-lg bg-slate-50">
+                                <h4 class="font-bold text-lg mb-4 text-center">2. Staff Finds an Item</h4>
+                                <div class="space-y-2">
+                                    <div class="flow-box">Logs into Portal</div>
+                                    <div class="h-6 flow-arrow"></div>
+                                    <div class="flow-box">Navigates to 'Lost & Found'</div>
+                                    <div class="h-6 flow-arrow"></div>
+                                    <div class="flow-box">Fills out 'Upload Found Item' Form</div>
+                                    <div class="h-6 flow-arrow"></div>
+                                    <div class="flow-box bg-sky-100 text-sky-800">Item Listed in Public Gallery</div>
+                                </div>
+                            </div>
+                            <!-- Viewing Flow -->
+                            <div class="border p-4 rounded-lg bg-slate-50">
+                               <h4 class="font-bold text-lg mb-4 text-center">3. Student Searches for Item</h4>
+                               <div class="space-y-2">
+                                    <div class="flow-box">Logs into Portal</div>
+                                    <div class="h-6 flow-arrow"></div>
+                                    <div class="flow-box">Views 'Found Items' Gallery</div>
+                                    <div class="h-6 flow-arrow"></div>
+                                    <div class="flow-box">Sees a Potential Match?</div>
+                                    <div class="h-6 flow-arrow"></div>
+                                    <div class="flow-box bg-sky-100 text-sky-800">Follows Instructions to Claim</div>
+                               </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Information Dissemination Flowchart -->
+                    <div>
+                        <h3 class="text-xl font-semibold text-sky-600 mb-6 text-center">Information Broadcast Flow</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="border p-4 rounded-lg bg-slate-50">
+                                <h4 class="font-bold text-lg mb-4 text-center">1. Administrator Creates a Message</h4>
+                                <div class="space-y-2">
+                                    <div class="flow-box">Navigates to 'Information Broadcast'</div>
+                                    <div class="h-6 flow-arrow"></div>
+                                    <div class="flow-box">Writes the Message/Notice</div>
+                                    <div class="h-6 flow-arrow"></div>
+                                    <div class="flow-box">Selects the Target Audience</div>
+                                    <div class="h-6 flow-arrow"></div>
+                                    <div class="flow-box bg-sky-100 text-sky-800">Sends Broadcast</div>
+                                </div>
+                            </div>
+                             <div class="border p-4 rounded-lg bg-slate-50">
+                                <h4 class="font-bold text-lg mb-4 text-center">2. Recipient Views the Message</h4>
+                                <div class="space-y-2">
+                                    <div class="flow-box">Receives Notification (Email/Alert)</div>
+                                    <div class="h-6 flow-arrow"></div>
+                                    <div class="flow-box">Logs into Portal to View</div>
+                                    <div class="h-6 flow-arrow"></div>
+                                    <div class="flow-box bg-sky-100 text-sky-800">Reads Information Directly from Source</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals Container -->
+    <div id="modals">
+        <!-- Report Lost Item Modal -->
+        <div id="reportLostItemModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center p-4">
+            <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-lg relative">
+                <button class="close-modal absolute top-4 right-4 text-slate-500 hover:text-slate-800">&times;</button>
+                <h3 class="text-2xl font-bold mb-4">Report a Lost Item</h3>
+                <form id="lostItemForm">
+                    <div class="space-y-4">
+                        <input type="text" name="itemName" placeholder="What item did you lose?" required class="w-full p-2 border rounded">
+                        <textarea name="itemDesc" placeholder="Describe the item (color, brand, etc.)" required class="w-full p-2 border rounded"></textarea>
+                        <input type="text" name="location" placeholder="Last known location" required class="w-full p-2 border rounded">
+                        <input type="date" name="date" required class="w-full p-2 border rounded">
+                        <select name="coordinator" required class="w-full p-2 border rounded">
+                            <option value="">Select your Class Coordinator</option>
+                            <option value="coord1">Dr. Smith (CS Dept.)</option>
+                            <option value="coord2">Prof. Jones (Mech Dept.)</option>
+                        </select>
+                        <button type="submit" class="w-full bg-amber-500 text-white p-3 rounded-lg font-semibold hover:bg-amber-600">Submit Report</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Admin Upload Modal -->
+        <div id="adminUploadModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center p-4">
+            <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-lg relative">
+                <button class="close-modal absolute top-4 right-4 text-slate-500 hover:text-slate-800">&times;</button>
+                <h3 class="text-2xl font-bold mb-4">Upload a Found Item</h3>
+                <form id="uploadItemForm">
+                    <div class="space-y-4">
+                        <input type="text" name="name" placeholder="Item Name (e.g., 'Blue Water Bottle')" required class="w-full p-2 border rounded">
+                        <input type="file" name="image" accept="image/*" required class="w-full p-2 border rounded file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100">
+                        <input type="text" name="location" placeholder="Location where item was found" required class="w-full p-2 border rounded">
+                        <input type="date" name="date" required class="w-full p-2 border rounded">
+                        <select name="category" required class="w-full p-2 border rounded">
+                            <option value="">Select Category</option>
+                            <option value="electronics">Electronics</option>
+                            <option value="stationery">Stationery</option>
+                            <option value="accessories">Accessories</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <button type="submit" class="w-full bg-slate-600 text-white p-3 rounded-lg font-semibold hover:bg-slate-700">Add Item to Gallery</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Create Message Modal -->
+        <div id="createMessageModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center p-4">
+             <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-2xl relative">
+                <button class="close-modal absolute top-4 right-4 text-slate-500 hover:text-slate-800">&times;</button>
+                <h3 class="text-2xl font-bold mb-4">Create a New Broadcast Message</h3>
+                <form id="messageForm">
+                    <div class="space-y-4">
+                        <input type="text" name="title" placeholder="Message Title" required class="w-full p-2 border rounded">
+                        <textarea name="content" placeholder="Compose your message here..." required rows="6" class="w-full p-2 border rounded"></textarea>
+                        <div>
+                            <label class="font-semibold mb-2 block">Select Target Audience:</label>
+                            <div class="p-3 border rounded-lg bg-slate-50">
+                                <div class="grid grid-cols-2 gap-x-4 gap-y-2">
+                                    <label class="flex items-center space-x-2"><input type="checkbox" class="rounded"><span>All Staff / HODs</span></label>
+                                    <label class="flex items-center space-x-2"><input type="checkbox" class="rounded"><span>All Class Coordinators</span></label>
+                                </div>
+                                <hr class="my-3">
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-2">
+                                    <label class="flex items-center space-x-2"><input type="checkbox" class="rounded"><span>All Students</span></label>
+                                    <label class="flex items-center space-x-2"><input type="checkbox" class="rounded"><span>1st Year Students</span></label>
+                                    <label class="flex items-center space-x-2"><input type="checkbox" class="rounded"><span>2nd Year Students</span></label>
+                                    <label class="flex items-center space-x-2"><input type="checkbox" class="rounded"><span>3rd Year Students</span></label>
+                                    <label class="flex items-center space-x-2"><input  type="checkbox" class="rounded"><span>4th Year Students</span></label>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-sky-500 text-white p-3 rounded-lg font-semibold hover:bg-sky-600">Send Broadcast</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Success Modal -->
+        <div id="successModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center p-4">
+            <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-sm text-center">
+                 <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+                    <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <h3 id="successTitle" class="text-xl font-bold mt-4">Success!</h3>
+                <p id="successMessage" class="text-slate-500 mt-2">Your action was completed.</p>
+                <button id="closeSuccessModal" class="mt-6 w-full bg-green-500 text-white p-2 rounded-lg font-semibold hover:bg-green-600">OK</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
