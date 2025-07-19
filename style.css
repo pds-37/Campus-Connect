@@ -1,0 +1,40 @@
+.tab-button.active {
+    border-color: #0ea5e9; /* sky-500 */
+    color: #0ea5e9;
+    background-color: #f0f9ff; /* sky-50 */
+}
+
+.modal {
+    display: none;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.flow-box {
+    border: 2px solid #cbd5e1; /* slate-300 */
+    background-color: white;
+    border-radius: 0.5rem; /* rounded-lg */
+    padding: 0.75rem; /* p-3 */
+    text-align: center;
+    font-size: 0.875rem; /* text-sm */
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1); /* shadow */
+}
+
+.flow-arrow {
+    position: relative;
+    color: #94a3b8; /* slate-400 */
+}
+
+.flow-arrow::after {
+    content: '▼';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.flow-arrow-right::after {
+    content: '►';
+}
