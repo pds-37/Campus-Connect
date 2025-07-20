@@ -156,3 +156,7 @@ Thanks to the Firebase, Node.js, and Tailwind CSS communities for the amazing to
 ---
 
 ```
+## Contributors:
+- [Priyanshu Tiwari](https://github.com/pds-37)
+- [Dost ka Naam](https://github.com/dost-ka-username)
+
