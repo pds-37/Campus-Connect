@@ -129,7 +129,7 @@ node server.js
 ├── style.css               # Custom styles + Tailwind classes
 ├── script.js               # Frontend logic and API calls
 ├── server.js               # Backend Express server
-├── serviceAccountKey.json  # Firebase private key (keep secret!)
+├── serviceAccountKey.json  # Firebase private key (kept secret!)
 
 ```
 
