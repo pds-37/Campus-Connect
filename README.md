@@ -153,10 +153,7 @@ MIT License. See `LICENSE` file for more information.
 
 Thanks to the Firebase, Node.js, and Tailwind CSS communities for the amazing tools.
 
----
-
-```
-## Contributors:
+ Contributors:
 - [Priyanshu Tiwari](https://github.com/pds-37)
-- [Dost ka Naam](https://github.com/dost-ka-username)
+- [Anurag Dubey ](https://github.com/iamanu26)
 
