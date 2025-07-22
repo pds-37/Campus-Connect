@@ -13,14 +13,12 @@ const multer = require('multer');
 const admin = require('firebase-admin');
 
 // --- FIREBASE SETUP ---
-// You must download your Firebase service account key JSON file and place it
-// in the same directory as this server.js file.
-// Rename the file to 'serviceAccountKey.json'.
+
 const serviceAccount = require('./serviceAccountKey.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: "lost-and-found-451b9.firebasestorage.app" // IMPORTANT: Replace with your Firebase Storage bucket URL (e.g., your-project-id.appspot.com)
+  storageBucket: "lost-and-found-451b9.firebasestorage.app" 
 });
 
 // Initialize Firestore database and Storage bucket.
